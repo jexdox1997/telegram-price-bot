@@ -24,9 +24,6 @@ bot.start((ctx) => {
 bot.hears('hi', (ctx) => {
   ctx.reply('Wag Wan');
 });
-bot.hears('hello', (ctx) => {
-  ctx.reply('Yo Fam');
-});
 
 bot.command('price', async (ctx) => {
   try {
