@@ -1,13 +1,13 @@
 require('dotenv').config();
-
+const http = require('http');
 const { Telegraf } = require('telegraf');
-
 const axios = require('axios');
+
+// Keep-alive server for Render
+http.createServer((req, res) => res.end('Bot is running')).listen(process.env.PORT || 3000);
+
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
-/**
- * Simple coin name mapping (we’ll improve later)
- */
 const coinMap = {
   btc: 'bitcoin',
   eth: 'ethereum',
@@ -23,14 +23,12 @@ bot.start((ctx) => {
 bot.hears('hi', (ctx) => {
   ctx.reply('Wag Wan');
 });
-
-/**
- * NEW: dynamic price command
- * Usage: /price btc
- */
+bot.hears('hello', (ctx) => {
+  ctx.reply('Wag Wan');
+});
 bot.command('price', async (ctx) => {
   try {
-    const input = ctx.message.text.split(' ')[1]; // get "btc"
+    const input = ctx.message.text.split(' ')[1];
 
     if (!input) {
       return ctx.reply('Usage: /price btc');
@@ -47,7 +45,6 @@ bot.command('price', async (ctx) => {
     );
 
     const price = response.data[coinId].usd;
-
     ctx.reply(`${input.toUpperCase()} Price: $${price}`);
   } catch (err) {
     ctx.reply('Error fetching price ❌');
