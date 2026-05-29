@@ -14,9 +14,10 @@ const coinMap = {
   btc: 'bitcoin',
   eth: 'ethereum',
   sol: 'solana',
-  bnb: 'binance-coin',
-  ton: 'toncoin'
+  bnb: 'binancecoin',
+  ton: 'the-open-network'
 };
+
 bot.start((ctx) => {
   ctx.reply('I am Active 🚀');
 });
@@ -34,12 +35,16 @@ bot.command('price', async (ctx) => {
     if (!coinId) return ctx.reply('Coin not supported yet ❌');
 
     const response = await axios.get(
-      `https://api.coincap.io/v2/assets/${coinId}`
+      `https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd`,
+      { headers: { 'Accept': 'application/json' }, timeout: 10000 }
     );
 
-    const price = parseFloat(response.data.data.priceUsd).toFixed(2);
+    const price = response.data[coinId]?.usd;
+    if (!price) return ctx.reply('Could not fetch price, try again ❌');
+    
     ctx.reply(`${input.toUpperCase()} Price: $${price}`);
   } catch (err) {
+    console.log('Price fetch error:', err.message);
     ctx.reply('Error fetching price ❌');
   }
 });
