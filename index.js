@@ -11,11 +11,11 @@ http.createServer((req, res) => res.end('Bot is running')).listen(PORT, '0.0.0.0
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
 const coinMap = {
-  btc: 'BTCUSDT',
-  eth: 'ETHUSDT',
-  sol: 'SOLUSDT',
-  bnb: 'BNBUSDT',
-  ton: 'TONUSDT'
+  btc: 'BTC-USDT',
+  eth: 'ETH-USDT',
+  sol: 'SOL-USDT',
+  bnb: 'BNB-USDT',
+  ton: 'TON-USDT'
 };
 
 bot.start((ctx) => {
@@ -35,14 +35,26 @@ bot.command('price', async (ctx) => {
     if (!symbol) return ctx.reply('Coin not supported yet ❌');
 
     const response = await axios.get(
-      `https://api.binance.com/api/v3/ticker/price?symbol=${symbol}`
+      `https://api.kucoin.com/api/v1/market/orderbook/level1?symbol=${symbol}`
     );
 
-    const price = parseFloat(response.data.price).toFixed(2);
+    const price = parseFloat(response.data.data.price).toFixed(2);
     ctx.reply(`${input.toUpperCase()} Price: $${price}`);
   } catch (err) {
     console.log('Price fetch error:', err.message);
+    console.log('Full error:', JSON.stringify(err.response?.data));
     ctx.reply('Error fetching price ❌');
+  }
+});
+
+bot.command('test', async (ctx) => {
+  try {
+    const response = await axios.get(
+      'https://api.kucoin.com/api/v1/market/orderbook/level1?symbol=BTC-USDT'
+    );
+    ctx.reply(JSON.stringify(response.data));
+  } catch (err) {
+    ctx.reply(`Error: ${err.message}`);
   }
 });
 
