@@ -35,26 +35,20 @@ bot.command('price', async (ctx) => {
     if (!symbol) return ctx.reply('Coin not supported yet ❌');
 
     const response = await axios.get(
-      `https://api.kucoin.com/api/v1/market/orderbook/level1?symbol=${symbol}`
+      `https://api.kucoin.com/api/v1/market/stats?symbol=${symbol}`
     );
 
-    const price = parseFloat(response.data.data.price).toFixed(2);
-    ctx.reply(`${input.toUpperCase()} Price: $${price}`);
+    const data = response.data.data;
+    const price = parseFloat(data.last).toFixed(2);
+    const change = parseFloat(data.changeRate * 100).toFixed(2);
+    const emoji = change >= 0 ? '🟢' : '🔴';
+
+    ctx.reply(
+      `${input.toUpperCase()} Price: $${price}\n${emoji} 24h Change: ${change}%`
+    );
   } catch (err) {
     console.log('Price fetch error:', err.message);
-    console.log('Full error:', JSON.stringify(err.response?.data));
     ctx.reply('Error fetching price ❌');
-  }
-});
-
-bot.command('test', async (ctx) => {
-  try {
-    const response = await axios.get(
-      'https://api.kucoin.com/api/v1/market/orderbook/level1?symbol=BTC-USDT'
-    );
-    ctx.reply(JSON.stringify(response.data));
-  } catch (err) {
-    ctx.reply(`Error: ${err.message}`);
   }
 });
 
